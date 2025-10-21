@@ -59,14 +59,17 @@ case "$TRAVIS_OS_NAME" in
         git clone "$DEPS_URL"
         wget "$PREMAKE_URL" -O premake.zip && unzip premake.zip
         echo "Building for x86_64"
-        $mingw64 ./premake5 --standard gmake2
-        $mingw64 make verbose=1 config=release_windows CC=clang CXX=clang++
         $mingw64 ./premake5 --standard --debug-console gmake2
         $mingw64 make verbose=1 config=debug_windows CC=clang CXX=clang++
         cp -r deadbeef-windows-deps/Windows-10 bin/debug/share/themes/Windows-10
-        cp -r deadbeef-windows-deps/Windows-10 bin/release/share/themes/Windows-10
         cp -r deadbeef-windows-deps/Windows-10-Icons bin/debug/share/icons/Windows-10-Icons
-        cp -r deadbeef-windows-deps/Windows-10-Icons bin/release/share/icons/Windows-10-Icons
+        $mingw64 ./premake5 --standard gmake2
+        cp -r bin/debug bin/debug2
+        rm bin/debug/deadbeef.exe
+        $mingw64 make config=debug_windows CC=clang CXX=clang++ deadbeef
+        strip --strip-unneeded bin/debug/deadbeef.exe bin/debug/plugins/*.dll
+        mv bin/debug bin/release
+        mv bin/debug2 bin/debug
         echo "Making zip packages"
         VERSION=`tr -d '\r' < PORTABLE_VERSION`
         mv bin/release bin/deadbeef-x86_64 && (cd bin && $msys2 zip -q -r deadbeef-$VERSION-windows-x86_64.zip deadbeef-x86_64/) && mv bin/deadbeef-x86_64 bin/release

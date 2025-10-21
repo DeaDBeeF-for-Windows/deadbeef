@@ -46,10 +46,8 @@ filter "configurations:debug"
   defines { "DEBUG" }
   symbols "On"
 
-filter "configurations:release"
-  buildoptions { "-O2" }
-
 filter "configurations:debug or release"
+  buildoptions { "-O2" }
   includedirs {
     "include",
     ".",

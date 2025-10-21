@@ -51,6 +51,8 @@ case "$TRAVIS_OS_NAME" in
         DISPATCH_URL="https://github.com/DeaDBeeF-for-Windows/swift-corelibs-libdispatch/releases/download/release%2F6.1.1/ddb-xdispatch-win-latest.zip"
         PREMAKE_URL="https://github.com/premake/premake-core/releases/download/v5.0.0-beta2/premake-5.0.0-beta2-windows.zip"
         DEPS_URL="https://github.com/kuba160/deadbeef-windows-deps.git"
+        CCACHE_DIR=`pwd`/.ccache
+        ccache --max-size 100M
         echo "Downloading xdispatch_ddb..."
         wget -q "$DISPATCH_URL" -O ddb-xdispatch-win-latest.zip
         echo "Unpacking xdispatch_ddb..."
@@ -60,13 +62,13 @@ case "$TRAVIS_OS_NAME" in
         wget "$PREMAKE_URL" -O premake.zip && unzip premake.zip
         echo "Building for x86_64"
         $mingw64 ./premake5 --standard --debug-console gmake2
-        $mingw64 make verbose=1 config=debug_windows CC=clang CXX=clang++
+        $mingw64 make verbose=1 config=debug_windows CC="ccache clang" CXX="ccache clang++"
         cp -r deadbeef-windows-deps/Windows-10 bin/debug/share/themes/Windows-10
         cp -r deadbeef-windows-deps/Windows-10-Icons bin/debug/share/icons/Windows-10-Icons
         $mingw64 ./premake5 --standard gmake2
         cp -r bin/debug bin/debug2
         rm bin/debug/deadbeef.exe
-        $mingw64 make config=debug_windows CC=clang CXX=clang++ deadbeef
+        $mingw64 make config=debug_windows CC="ccache clang" CXX="ccache clang++" deadbeef
         strip --strip-unneeded bin/debug/deadbeef.exe bin/debug/plugins/*.dll
         mv bin/debug bin/release
         mv bin/debug2 bin/debug
